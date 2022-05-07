@@ -1,0 +1,52 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: grid;
+}
+
+#header {
+    display: grid;
+}
+
+#boardContainer {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    
+    width: 100vw;
+    height: 50vh;
+
+    padding: 8px;
+}
+
+#gameBoard{
+    display: grid;
+    width: 25vw;
+    height: 25vw;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-item{
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    place-content: center;
+}
+
+.no-r{
+    border-right: none;
+}
+
+.no-b{
+    border-bottom: none;
+}
+
+.grid-item:hover{
+    background-color: gray;
+}
+
+#header, form, #boardContainer{
+    border: 1px solid black;
+}
