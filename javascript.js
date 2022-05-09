@@ -19,7 +19,6 @@ const gameBoard = (() => {
     let _grid = Array.from(document.querySelectorAll(".grid-item"));
 
     console.log(_grid);
-    console.log(_columns);
 
     const _getIndex = () => {
 
@@ -37,8 +36,11 @@ const gameBoard = (() => {
 
         const input = document.createElement('img');
         let _turn = gameProgression.getTurn();
+        console.log(e.path[0].innerHTML)
 
-        if (_turn == 'x'){
+        if (e.path[0].innerHTML != ''){
+            return
+        } else if (_turn == 'x'){
             input.src = "icons/close.svg";
         } else if (_turn == 'o'){
             input.src = "icons/circle-outline.svg";
@@ -46,7 +48,7 @@ const gameBoard = (() => {
         e.path[0].appendChild(input);
 
         // _grid[index].appendChild(input);
-        // gameProgression.checkWin;
+        // gameProgression.checkWin();
         gameProgression.changeTurn();
     }
 
@@ -73,19 +75,26 @@ const gameProgression = (() => {
     }
     const checkWin = () => {
         //check rows
-        if (_grid[0].innerHTML==_grid[1].innerHTML==_grid[2].innerHTML ||
-            _grid[3].innerHTML==_grid[4].innerHTML==_grid[5].innerHTML ||
-            _grid[6].innerHTML==_grid[7].innerHTML==_grid[8].innerHTML) {
+        if ((gameBoard.getContent(0)==gameBoard.getContent(1)==gameBoard.getContent(2) || 
+             gameBoard.getContent(3)==gameBoard.getContent(4)==gameBoard.getContent(5) || 
+             gameBoard.getContent(6)==gameBoard.getContent(7)==gameBoard.getContent(8))) {
+
+                
                 //compare sign to computer/player1/player2 and open winning module
         
             //check columns
-            } else if (_grid[0].innerHTML==_grid[3].innerHTML==_grid[6].innerHTML ||
-                       _grid[1].innerHTML==_grid[4].innerHTML==_grid[7].innerHTML ||
-                       _grid[2].innerHTML==_grid[5].innerHTML==_grid[8].innerHTML) {
+            } else if ((gameBoard.getContent(0)==gameBoard.getContent(3)==gameBoard.getContent(6) || 
+                        gameBoard.getContent(1)==gameBoard.getContent(4)==gameBoard.getContent(7) || 
+                        gameBoard.getContent(2)==gameBoard.getContent(5)==gameBoard.getContent(8))) {
+
+                        
                             //compare sign to computer/player1/player2 and open winning module
+
                 //check diagonals
-                } else if (_grid[0].innerHTML==_grid[4].innerHTML==_grid[8].innerHTML || 
-                           _grid[2].innerHTML==_grid[4].innerHTML==_grid[6].innerHTML) {
+                } else if ((gameBoard.getContent(0)==gameBoard.getContent(4)==gameBoard.getContent(8) || 
+                            gameBoard.getContent(2)==gameBoard.getContent(4)==gameBoard.getContent(6))) {
+
+                
                                 //compare sign to computer/player1/player2 and open winning module
                            }
     }
