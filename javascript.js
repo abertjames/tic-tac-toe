@@ -19,6 +19,7 @@ const gameBoard = (() => {
     let _grid = Array.from(document.querySelectorAll(".grid-item"));
 
     console.log(_grid);
+    console.log(_columns);
 
     const _getIndex = () => {
 
@@ -72,12 +73,27 @@ const gameProgression = (() => {
     }
     const checkWin = () => {
         //check rows
-        //check columns
-        //check diagonals
+        if (_grid[0].innerHTML==_grid[1].innerHTML==_grid[2].innerHTML ||
+            _grid[3].innerHTML==_grid[4].innerHTML==_grid[5].innerHTML ||
+            _grid[6].innerHTML==_grid[7].innerHTML==_grid[8].innerHTML) {
+                //compare sign to computer/player1/player2 and open winning module
+        
+            //check columns
+            } else if (_grid[0].innerHTML==_grid[3].innerHTML==_grid[6].innerHTML ||
+                       _grid[1].innerHTML==_grid[4].innerHTML==_grid[7].innerHTML ||
+                       _grid[2].innerHTML==_grid[5].innerHTML==_grid[8].innerHTML) {
+                            //compare sign to computer/player1/player2 and open winning module
+                //check diagonals
+                } else if (_grid[0].innerHTML==_grid[4].innerHTML==_grid[8].innerHTML || 
+                           _grid[2].innerHTML==_grid[4].innerHTML==_grid[6].innerHTML) {
+                                //compare sign to computer/player1/player2 and open winning module
+                           }
     }
     
-    const getTurn = () => {
-        return _turn;
+    const getTurn = () => _turn;
+
+    const changePlayerTurn = () => {
+        
     }
 
     return {changeTurn, checkWin, getTurn}
