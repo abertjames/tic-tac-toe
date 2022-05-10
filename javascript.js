@@ -48,7 +48,7 @@ const gameBoard = (() => {
         e.path[0].appendChild(input);
 
         // _grid[index].appendChild(input);
-        // gameProgression.checkWin();
+        // gameProgression.checkWin(e);
         gameProgression.changeTurn();
     }
 
@@ -73,13 +73,13 @@ const gameProgression = (() => {
             _turn = 'x';
         }
     }
-    const checkWin = () => {
+    const checkWin = (e) => {
         //check rows
         if ((gameBoard.getContent(0)==gameBoard.getContent(1)==gameBoard.getContent(2) || 
              gameBoard.getContent(3)==gameBoard.getContent(4)==gameBoard.getContent(5) || 
              gameBoard.getContent(6)==gameBoard.getContent(7)==gameBoard.getContent(8))) {
 
-                
+                _congratulateWinner(e);
                 //compare sign to computer/player1/player2 and open winning module
         
             //check columns
@@ -87,6 +87,7 @@ const gameProgression = (() => {
                         gameBoard.getContent(1)==gameBoard.getContent(4)==gameBoard.getContent(7) || 
                         gameBoard.getContent(2)==gameBoard.getContent(5)==gameBoard.getContent(8))) {
 
+                            _congratulateWinner(e);
                         
                             //compare sign to computer/player1/player2 and open winning module
 
@@ -94,12 +95,19 @@ const gameProgression = (() => {
                 } else if ((gameBoard.getContent(0)==gameBoard.getContent(4)==gameBoard.getContent(8) || 
                             gameBoard.getContent(2)==gameBoard.getContent(4)==gameBoard.getContent(6))) {
 
+                                _congratulateWinner(e);
                 
                                 //compare sign to computer/player1/player2 and open winning module
                            }
     }
     
     const getTurn = () => _turn;
+
+    const _congratulateWinner = (e) => {
+        if (e.path[0].innerHTML == Player.getPlayerSign){
+
+        }
+    }
 
     const changePlayerTurn = () => {
         
