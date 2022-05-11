@@ -9,25 +9,39 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="header"> 
-        Header 
-        <form action="">
-            <select name="difficulty" id="difficulty">
-                <option value="ezpz">EZPZ</option>
-                <option value="ehh">Ehh</option>
-                <option value="oof">Oof</option>
-                <option value="yikesBuddy">Yikes Buddy...</option>
-            </select>
-        </form>
-        <label class="switch">
-            <input type="checkbox">
+    <div id="header">  
+        <div>
+            player one
+            <form action="">
+                <select name="difficulty" id="difficulty">
+                    <option value="ezpz">EZPZ</option>
+                    <option value="ehh">Ehh</option>
+                    <option value="oof">Oof</option>
+                    <option value="yikesBuddy">Yikes Buddy...</option>
+                </select>
+            </form>
+        </div>
+        <div>
+            player two
+            <form action="">
+                <select name="difficulty" id="difficulty">
+                    <option value="ezpz">EZPZ</option>
+                    <option value="ehh">Ehh</option>
+                    <option value="oof">Oof</option>
+                    <option value="yikesBuddy">Yikes Buddy...</option>
+                </select>
+            </form>
+        </div>
+        
+        <!-- <label class="switch">
+            <input type="radio" name="sign">
             <span class="slider round"></span>
           </label>
           
           <label class="switch">
-            <input type="checkbox" checked>
+            <input type="radio" name="sign" checked>
             <span class="slider round"></span>
-          </label>
+          </label> -->
     </div>
     <div id="boardContainer">
         <div id="gameBoard">
@@ -42,7 +56,13 @@
             <div class="grid-item no-r no-b"></div>
         </div>
     </div>
-    <button id="restart" onclick="gameBoard.resetGrid()">Restart</button>
+    <button id="restart" >Restart</button>
+
+    <div class="modal" id="resultModal">
+        the winner is the power of friendship
+    </div>
+    <div class="overlay" id="overlay"></div>
+
 
 </body>
 </html>
