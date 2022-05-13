@@ -2,15 +2,27 @@
 //////////////////////////////////////////////////// set up players /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const Player = ((sign,type) => {
-    const _sign = sign;
-    const _type = type;
-    const _turn = true;
+const Player = (sign, type, difficulty) => {
+    //x is true o is false for sign 
+    //huamn player is true AI is false for type
 
+    let _sign = sign;
+    //make an if statment for if sign is x or o and make _sign an appropriate image source link
+    let _type = type;
+    let _difficulty = difficulty;
+
+    //have each button input update either player1 or player2 and then there doesnt need to be an input for these for player
+    const updatePlayer = (sign, type, difficulty) => {
+        _sign = sign;
+        _type = type;
+        _difficulty = difficulty;
+    }
+    const getPlayerType = () => _type;
+    const getDifficulty = () => _difficulty;
     const getPlayerSign = () => _sign;
-    const getPlayerTurn = () => _turn;
-    return {getPlayerSign, getPlayerTurn}
-})();
+
+    return {getPlayerSign, getDifficulty, updatePlayer, getPlayerType}
+};
 
 const AiPlayer = (() => {
 
@@ -21,6 +33,46 @@ const AiPlayer = (() => {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const gameBoard = (() => {
+
+    const player1 = Player(true, false, null);
+    const player2 = Player(false, false, null);
+
+    const updatePlayer = (player, sign, type, difficulty) => {
+        player.updatePlayer(sign, type, difficulty);
+    };
+
+    const signOneSelector = document.getElementById("p1_sign");
+    signOneSelector.addEventListener("change", (e) => {
+        updatePlayer(player1, !player1.getPlayerSign(), player1.getPlayerType(), player1.getDifficulty());
+        updatePlayer(player2, !player2.getPlayerSign(), player2.getPlayerType(), player2.getDifficulty());
+        if (e.target.value == 'o'){
+            signTwoSelector.value = 'x';
+        } else if (e.target.value == 'x'){
+            signTwoSelector.value = 'o';
+        }
+    });
+
+    const signTwoSelector = document.getElementById("p2_sign");
+    signTwoSelector.addEventListener("change", (e) => {
+        updatePlayer(player2, !player2.getPlayerSign(), player2.getPlayerType(), player2.getDifficulty());
+        updatePlayer(player1, !player1.getPlayerSign(), player1.getPlayerType(), player2.getDifficulty());
+        if (e.target.value == 'x'){
+            signOneSelector.value = 'o';
+        } else if (e.target.value == 'o'){
+            signOneSelector.value = 'x';
+        }
+    });
+
+    const botOrNot1 = document.getElementById("botOrNot1");
+    botOrNot1.addEventListener("change", () => {
+        updatePlayer(player1, player1.getPlayerSign(), player1.getPlayerType(), !player1.getPlayerType());
+    });
+
+    const botOrNot2 = document.getElementById("botOrNot2");
+    botOrNot2.addEventListener("change", () => {
+        updatePlayer(player2, player2.getPlayerSign(), player2.getPlayerType(), !player2.getPlayerType());
+    });
+
 
     const restartButton = document.getElementById("restart");
     restartButton.onclick = () => restart();
@@ -40,14 +92,24 @@ const gameBoard = (() => {
 
         const input = document.createElement('img');
         let _turn = gameProgression.getTurn();
+        let _currentPlayer = gameProgression.getCurrentPlayer();
+        console.log(_currentPlayer);
         // console.log(e.path[0].innerHTML)
+
+        // if (e.path[0].innerHTML != ''){
+        //     return
+        // } else if (_turn == 'x'){
+        //     input.src = "icons/close.svg";
+        // } else if (_turn == 'o'){
+        //     input.src = "icons/circle-outline.svg";
+        // }
 
         if (e.path[0].innerHTML != ''){
             return
-        } else if (_turn == 'x'){
-            input.src = "icons/close.svg";
-        } else if (_turn == 'o'){
-            input.src = "icons/circle-outline.svg";
+        } else if (_currentPlayer == "player1"){
+            input.src = player1.getPlayerSign();
+        } else if (_currentPlayer == "player2"){
+            input.src = player2.getPlayerSign();
         }
         e.path[0].appendChild(input);
 
@@ -63,7 +125,7 @@ const gameBoard = (() => {
     _grid.forEach((item) => item.addEventListener('click', applyInput));
     console.log(_grid);
 
-    return {restart, getContent, applyInput, getGrid}
+    return {restart, getContent, applyInput, getGrid, updatePlayer}
 })();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,9 +133,6 @@ const gameBoard = (() => {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const gameProgression = (() => {
-
-    let player1;
-    let player2;
 
     let _turn = 'x';
     const changeTurn = () => {
@@ -83,32 +142,9 @@ const gameProgression = (() => {
             _turn = 'x';
         }
     }
+    const getTurn = () => _turn;
 
     const checkWin = () => {
-        // //check rows and prevents an empty row from triggering a win
-        // if (((gameBoard.getContent(0)===gameBoard.getContent(1)===gameBoard.getContent(2) && gameBoard.getContent(0)!=='') || 
-        //      (gameBoard.getContent(3)===gameBoard.getContent(4)===gameBoard.getContent(5) && gameBoard.getContent(3)!=='') || 
-        //      (gameBoard.getContent(6)===gameBoard.getContent(7)===gameBoard.getContent(8) && gameBoard.getContent(6)!==''))) {
-
-        //         _congratulateWinner();
-        
-        //     //check columns and prevents and empty column from triggering a win
-        //     } else if (((gameBoard.getContent(0)===gameBoard.getContent(3)===gameBoard.getContent(6) && gameBoard.getContent(0)!=='') || 
-        //                 (gameBoard.getContent(1)===gameBoard.getContent(4)===gameBoard.getContent(7) && gameBoard.getContent(1)!=='') || 
-        //                 (gameBoard.getContent(2)===gameBoard.getContent(5)===gameBoard.getContent(8) && gameBoard.getContent(2)!==''))) {
-
-        //                     _congratulateWinner();
-                        
-        //         //check diagonals
-        //         } else if ((gameBoard.getContent(0)===gameBoard.getContent(4)===gameBoard.getContent(8) || 
-        //                     gameBoard.getContent(2)===gameBoard.getContent(4)===gameBoard.getContent(6)) && gameBoard.getContent(4)!=='') {
-
-        //                         _congratulateWinner();
-                
-        //                     //check tie by checking if the board is full
-        //                    } else if (!(gameBoard.getGrid().some((item) => item.innerHTML == ''))){
-        //                         resultModal.textContent = "The winner is the power of friendship :)"
-        //                    }
         //row
         if (gameBoard.getContent(0)==gameBoard.getContent(1) && gameBoard.getContent(0)==gameBoard.getContent(2) && gameBoard.getContent(0)!=''){
             _congratulateWinner();
@@ -119,7 +155,7 @@ const gameProgression = (() => {
         } else if (gameBoard.getContent(6)==gameBoard.getContent(7) && gameBoard.getContent(6)==gameBoard.getContent(8) && gameBoard.getContent(6)!=''){
             _congratulateWinner();
 
-            //col
+        //col
         } else if (gameBoard.getContent(0)==gameBoard.getContent(3) && gameBoard.getContent(0)==gameBoard.getContent(6) && gameBoard.getContent(0)!='' ){
             _congratulateWinner();
 
@@ -129,21 +165,21 @@ const gameProgression = (() => {
         } else if (gameBoard.getContent(2)===gameBoard.getContent(5) && gameBoard.getContent(2)==gameBoard.getContent(8) && gameBoard.getContent(2)!=''){
             _congratulateWinner();
 
-            //diag
+        //diag
         } else if (gameBoard.getContent(0)===gameBoard.getContent(4) && gameBoard.getContent(0)==gameBoard.getContent(8) && gameBoard.getContent(4)!=''){
             _congratulateWinner();
 
         } else if (gameBoard.getContent(2)===gameBoard.getContent(4) && gameBoard.getContent(2)==gameBoard.getContent(6) && gameBoard.getContent(4)!='') {
             _congratulateWinner();
-
+            
+        //tie
+        } else if (!gameBoard.getGrid().some((item) => item.innerHTML == '')){
+            overlay.style.display = "block";
+            resultModal.style.display = "block";
+            resultModal.textContent = "The winner is the power of friendship :)"
         }
-
-
-
     }
     
-    const getTurn = () => _turn;
-
     const resultModal = document.getElementById("resultModal");
     const overlay = document.getElementById("overlay");
     overlay.addEventListener('click', () => {
@@ -158,20 +194,21 @@ const gameProgression = (() => {
         resultModal.textContent = "The winner is " + `${_currentPlayer}` + "!";
     }
 
-    let _currentPlayer = player1;
+    let _currentPlayer = "player1";
     const changePlayerTurn = () => {
-        if (currentPlayer == player1){
-            currentPlayer = player2;
-        } else if (currentPlayer == player2){
-            currentPlayer = player1;
+        if (_currentPlayer == "player1"){
+            _currentPlayer = "player2";
+        } else if (_currentPlayer == "player2"){
+            _currentPlayer = "player1";
         }
     }
 
     const getCurrentPlayer = () => _currentPlayer;
     const setCurrentPlayer = () => {
-        _currentPlayer = player1;
+        _currentPlayer = "player1";
         _turn = 'x';
     };
+
 
     return {changeTurn, checkWin, getTurn, getCurrentPlayer, changePlayerTurn, setCurrentPlayer}
 })();
