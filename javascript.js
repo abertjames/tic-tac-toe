@@ -8,6 +8,12 @@ const Player = (sign, type, difficulty) => {
 
     let _sign = sign;
     //make an if statment for if sign is x or o and make _sign an appropriate image source link
+    // if (sign == true){
+    //     _sign = "icons/close.svg";
+    // } else if (sign == false){
+    //     _sign = "icons/circle-outline.svg";
+    // }
+
     let _type = type;
     let _difficulty = difficulty;
 
@@ -89,6 +95,13 @@ const gameBoard = (() => {
     const restart = () => {
         _grid.forEach((item) => item.innerHTML = '');
         gameProgression.setCurrentPlayer();
+
+        signOneSelector.removeAttribute("disabled");
+        signTwoSelector.removeAttribute("disabled");
+        botOrNot1.removeAttribute("disabled");
+        botOrNot2.removeAttribute("disabled");
+        p1_difficulty.removeAttribute("disabled");
+        p2_difficulty.removeAttribute("disabled");
     }
 
     const _getIndex = () => {
@@ -97,36 +110,37 @@ const gameBoard = (() => {
 
     const applyInput = (e) => {
 
-        const input = document.createElement('img');
-        let _turn = gameProgression.getTurn();
-        let _currentPlayer = gameProgression.getCurrentPlayer();
-        // console.log(_currentPlayer);
-        // console.log(e.path[0].innerHTML)
+        signOneSelector.setAttribute("disabled", "");
+        signTwoSelector.setAttribute("disabled", "");
+        botOrNot1.setAttribute("disabled", "");
+        botOrNot2.setAttribute("disabled", "");
+        p1_difficulty.setAttribute("disabled", "");
+        p2_difficulty.setAttribute("disabled", "");
 
-        // if (e.path[0].innerHTML != ''){
-        //     return
-        // } else if (_turn == 'x'){
-        //     input.src = "icons/close.svg";
-        // } else if (_turn == 'o'){
-        //     input.src = "icons/circle-outline.svg";
-        // }
+
+        const input = document.createElement('img');
+        let _currentPlayer = gameProgression.getCurrentPlayer();
 
         if (e.path[0].innerHTML != ''){
             return
         } else if (_currentPlayer == "player1"){
-            input.src = player1.getPlayerSign();
+            if (player1.getPlayerSign() == true){
+                input.src = "icons/close.svg";
+            } else if(player1.getPlayerSign() == false) {
+                input.src = "icons/circle-outline.svg";
+            }
         } else if (_currentPlayer == "player2"){
-            input.src = player2.getPlayerSign();
+            if (player2.getPlayerSign() == true){
+                input.src = "icons/close.svg";
+            } else if(player2.getPlayerSign() == false) {
+                input.src = "icons/circle-outline.svg";
+            }
         }
         e.path[0].appendChild(input);
 
         gameProgression.checkWin();
-        // gameProgression.changePlayerTurn();
-        gameProgression.changeTurn();
+        gameProgression.changePlayerTurn();
     }
-
-    // const _initialize = (() => {
-    // })();
 
     let _grid = Array.from(document.querySelectorAll(".grid-item"));
     _grid.forEach((item) => item.addEventListener('click', applyInput));
@@ -143,16 +157,6 @@ const gameBoard = (() => {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const gameProgression = (() => {
-
-    let _turn = 'x';
-    const changeTurn = () => {
-        if (_turn == 'x'){
-            _turn = 'o';
-        } else if (_turn == 'o') {
-            _turn = 'x';
-        }
-    }
-    const getTurn = () => _turn;
 
     const checkWin = () => {
         //row
@@ -215,13 +219,10 @@ const gameProgression = (() => {
     }
 
     const getCurrentPlayer = () => _currentPlayer;
-    const setCurrentPlayer = () => {
-        _currentPlayer = "player1";
-        _turn = 'x';
-    };
+    const setCurrentPlayer = () => _currentPlayer = "player1";;
 
 
-    return {changeTurn, checkWin, getTurn, getCurrentPlayer, changePlayerTurn, setCurrentPlayer}
+    return {checkWin, getCurrentPlayer, changePlayerTurn, setCurrentPlayer}
 })();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
