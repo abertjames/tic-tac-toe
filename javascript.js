@@ -65,12 +65,22 @@ const gameBoard = (() => {
 
     const botOrNot1 = document.getElementById("botOrNot1");
     botOrNot1.addEventListener("change", () => {
-        updatePlayer(player1, player1.getPlayerSign(), player1.getPlayerType(), !player1.getPlayerType());
+        updatePlayer(player1, player1.getPlayerSign(), !player1.getPlayerType(), player1.getDifficulty());
     });
 
     const botOrNot2 = document.getElementById("botOrNot2");
     botOrNot2.addEventListener("change", () => {
-        updatePlayer(player2, player2.getPlayerSign(), player2.getPlayerType(), !player2.getPlayerType());
+        updatePlayer(player2, player2.getPlayerSign(), !player2.getPlayerType(), player2.getDifficulty());
+    });
+
+    const p1_difficulty = document.getElementById("p1_difficulty");
+    p1_difficulty.addEventListener("change", (e) => {
+        updatePlayer(player1, player1.getPlayerSign(), player1.getPlayerType(), e.target.value);
+    });
+
+    const p2_difficulty = document.getElementById("p2_difficulty");
+    p2_difficulty.addEventListener("change", (e) => {
+        updatePlayer(player2, player2.getPlayerSign(), player2.getPlayerType(), e.target.value);
     });
 
 
@@ -85,15 +95,12 @@ const gameBoard = (() => {
 
     }
 
-    const getContent = (index) => _grid[index].innerHTML;
-    const getGrid = () => _grid;
-
     const applyInput = (e) => {
 
         const input = document.createElement('img');
         let _turn = gameProgression.getTurn();
         let _currentPlayer = gameProgression.getCurrentPlayer();
-        console.log(_currentPlayer);
+        // console.log(_currentPlayer);
         // console.log(e.path[0].innerHTML)
 
         // if (e.path[0].innerHTML != ''){
@@ -123,8 +130,11 @@ const gameBoard = (() => {
 
     let _grid = Array.from(document.querySelectorAll(".grid-item"));
     _grid.forEach((item) => item.addEventListener('click', applyInput));
-    console.log(_grid);
+    const getContent = (index) => _grid[index].innerHTML;
+    const getGrid = () => _grid;
+    // console.log(_grid);
 
+    // need to add a get player function because the ai will need to grab the dificulty level 
     return {restart, getContent, applyInput, getGrid, updatePlayer}
 })();
 
@@ -194,6 +204,7 @@ const gameProgression = (() => {
         resultModal.textContent = "The winner is " + `${_currentPlayer}` + "!";
     }
 
+    // need to check if the player is a bot here 
     let _currentPlayer = "player1";
     const changePlayerTurn = () => {
         if (_currentPlayer == "player1"){
