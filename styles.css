@@ -25,17 +25,29 @@ body {
     padding: 8px;
 }
 
+p {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
 #gameBoard{
     display: grid;
-    width: 25vw;
-    height: 25vw;
+    width: 300px;
+    height: 300px;
     grid-template-columns: repeat(3, 1fr);
 }
 
 .grid-item{
     border-right: 1px solid black;
     border-bottom: 1px solid black;
+    display: grid;
     place-content: center;
+    width: 100px;
+    height: 100px;
+}
+
+img{
+    transform: scale(2);
 }
 
 .no-r{

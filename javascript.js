@@ -4,20 +4,12 @@
 
 const Player = (sign, type, difficulty) => {
     //x is true o is false for sign 
-    //huamn player is true AI is false for type
+    //huamn player is false AI is true for type
 
     let _sign = sign;
-    //make an if statment for if sign is x or o and make _sign an appropriate image source link
-    // if (sign == true){
-    //     _sign = "icons/close.svg";
-    // } else if (sign == false){
-    //     _sign = "icons/circle-outline.svg";
-    // }
-
     let _type = type;
     let _difficulty = difficulty;
 
-    //have each button input update either player1 or player2 and then there doesnt need to be an input for these for player
     const updatePlayer = (sign, type, difficulty) => {
         _sign = sign;
         _type = type;
@@ -45,6 +37,14 @@ const gameBoard = (() => {
 
     const updatePlayer = (player, sign, type, difficulty) => {
         player.updatePlayer(sign, type, difficulty);
+    };
+
+    const getPlayer = (player) => {
+        if(player == "player1"){
+            return player1
+        } else if (player == "player2"){
+            return player2
+        }
     };
 
     const signOneSelector = document.getElementById("p1_sign");
@@ -89,34 +89,39 @@ const gameBoard = (() => {
         updatePlayer(player2, player2.getPlayerSign(), player2.getPlayerType(), e.target.value);
     });
 
-
     const restartButton = document.getElementById("restart");
     restartButton.onclick = () => restart();
     const restart = () => {
         _grid.forEach((item) => item.innerHTML = '');
         gameProgression.setCurrentPlayer();
-
-        signOneSelector.removeAttribute("disabled");
-        signTwoSelector.removeAttribute("disabled");
-        botOrNot1.removeAttribute("disabled");
-        botOrNot2.removeAttribute("disabled");
-        p1_difficulty.removeAttribute("disabled");
-        p2_difficulty.removeAttribute("disabled");
+        _enableInput();
     }
 
     const _getIndex = () => {
 
     }
 
-    const applyInput = (e) => {
+    const _enableInput = () => {
+        signOneSelector.removeAttribute("disabled");
+        signTwoSelector.removeAttribute("disabled");
+        botOrNot1.removeAttribute("disabled");
+        botOrNot2.removeAttribute("disabled");
+        p1_difficulty.removeAttribute("disabled");
+        p2_difficulty.removeAttribute("disabled");
+    };
 
+    const _disableInput = () => {
         signOneSelector.setAttribute("disabled", "");
         signTwoSelector.setAttribute("disabled", "");
         botOrNot1.setAttribute("disabled", "");
         botOrNot2.setAttribute("disabled", "");
         p1_difficulty.setAttribute("disabled", "");
         p2_difficulty.setAttribute("disabled", "");
+    }
 
+    const applyInput = (e) => {
+
+        _disableInput();
 
         const input = document.createElement('img');
         let _currentPlayer = gameProgression.getCurrentPlayer();
@@ -137,10 +142,16 @@ const gameBoard = (() => {
             }
         }
         e.path[0].appendChild(input);
-
         gameProgression.checkWin();
         gameProgression.changePlayerTurn();
     }
+
+    const gameBoard = document.getElementById("gameBoard");
+    gameBoard.addEventListener("click", () => {
+        if(player1.getPlayerType() == true){
+            //redirect to AI program 
+        }
+    });
 
     let _grid = Array.from(document.querySelectorAll(".grid-item"));
     _grid.forEach((item) => item.addEventListener('click', applyInput));
@@ -149,7 +160,7 @@ const gameBoard = (() => {
     // console.log(_grid);
 
     // need to add a get player function because the ai will need to grab the dificulty level 
-    return {restart, getContent, applyInput, getGrid, updatePlayer}
+    return {restart, getContent, applyInput, getGrid, updatePlayer, getPlayer}
 })();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,14 +224,22 @@ const gameProgression = (() => {
     const changePlayerTurn = () => {
         if (_currentPlayer == "player1"){
             _currentPlayer = "player2";
+            if (gameBoard.getPlayer("player2").getPlayerType() == true){
+            //if getPlayer2 . getPlayerType == false then redirect to AI and change turn back  
+            //call AI with current player as input
+            AiController.randomMove();
+            }
         } else if (_currentPlayer == "player2"){
             _currentPlayer = "player1";
+            if (gameBoard.getPlayer("player1").getPlayerType() == true){
+            //if getPlayer1 . getPlayerType == false then redirect to AI and change turn back 
+
+            }
         }
     }
 
     const getCurrentPlayer = () => _currentPlayer;
     const setCurrentPlayer = () => _currentPlayer = "player1";;
-
 
     return {checkWin, getCurrentPlayer, changePlayerTurn, setCurrentPlayer}
 })();
@@ -229,3 +248,49 @@ const gameProgression = (() => {
 //////////////////////////////////////////////////// AI functions ///////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+const AiController = (() => {
+
+    const _openSquares = () => gameBoard.getGrid().filter((item) => item.innerHTML== '');
+    const _randomNumber = () => Math.floor(Math.random()*_openSquares().length);
+
+    const randomMove = () => {
+        const input = document.createElement("img");
+        if(gameBoard.getPlayer(gameProgression.getCurrentPlayer()).getPlayerSign() == true){
+            input.src = "icons/close.svg";
+        } else if (gameBoard.getPlayer(gameProgression.getCurrentPlayer()).getPlayerSign() == false){
+            input.src = "icons/circle-outline.svg";
+        }
+
+        _openSquares()[_randomNumber()].appendChild(input);
+        gameProgression.changePlayerTurn();
+    };
+
+    // const _randomMove = () => {
+    //     //random number constant to be made here
+    //     const _randomNumber = Math.floor(Math.random()*8);
+    //     const _randomSquare = gameBoard.getContent(_randomNumber);
+
+    //     if (_randomSquare==''){
+    //         // const input = document.createElement('img');
+    //         if(gameBoard.getPlayer(gameProgression.getCurrentPlayer).getPlayerSign() == true){
+    //             gameBoard.getGrid()[_randomNumber].innerHTML = "icons/close.svg";
+    //             // input.src = "icons/close.svg";
+
+    //         } else if (gameBoard.getPlayer(gameProgression.getCurrentPlayer).getPlayerSign() == false){
+    //             gameBoard.getGrid()[_randomNumber].innerHTML = "icons/circle-outline.svg";
+    //         }
+
+    //         // .appendChild(input);
+    //     } else if (_randomSquare != ''){
+    //         _randomMove();
+    //     }
+    // };
+
+
+
+    const checkDifficulty = () => {
+
+    };
+
+    return {randomMove}
+})();
