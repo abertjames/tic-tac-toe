@@ -91,10 +91,7 @@ const gameBoard = (() => {
         _grid.forEach((item) => item.innerHTML = '');
         gameProgression.setCurrentPlayer();
         _enableInput();
-    }
-
-    const _getIndex = () => {
-
+        AiController.resetAiBoard();
     }
 
     const _enableInput = () => {
@@ -130,27 +127,31 @@ const gameBoard = (() => {
         } else if (_currentPlayer == "player1"){
             if (player1.getPlayerSign() == true){
                 input.src = "icons/close.svg";
+                AiController.updateAiBoard(e.target.id,true);
             } else if(player1.getPlayerSign() == false) {
                 input.src = "icons/circle-outline.svg";
+                AiController.updateAiBoard(e.target.id,false);
             }
         } else if (_currentPlayer == "player2"){
             if (player2.getPlayerSign() == true){
                 input.src = "icons/close.svg";
+                AiController.updateAiBoard(e.target.id,true);
             } else if(player2.getPlayerSign() == false) {
                 input.src = "icons/circle-outline.svg";
+                AiController.updateAiBoard(e.target.id,false);
             }
         }
         e.path[0].appendChild(input);
+        // console.log(e)
+        // console.log(e.target.id)
         gameProgression.checkWin();
+        
     }
 
     const gameBoard = document.getElementById("gameBoard");
     gameBoard.addEventListener("click", () => {
         _disableInput();
-        //disable grid from user input
-        //check why there are double inputs
         if(player1.getPlayerType() == true && !(_grid.some((item) => item.innerHTML!='')) ){
-            //redirect to AI program 
             setTimeout(AiController.checkDifficulty, 2500);
         }
     });
@@ -159,9 +160,8 @@ const gameBoard = (() => {
     _grid.forEach((item) => item.addEventListener('click', applyInput));
     const getContent = (index) => _grid[index].innerHTML;
     const getGrid = () => _grid;
-    // console.log(_grid);
+    console.log(_grid);
 
-    // need to add a get player function because the ai will need to grab the dificulty level 
     return {restart, getContent, applyInput, getGrid, updatePlayer, getPlayer}
 })();
 
@@ -215,6 +215,7 @@ const gameProgression = (() => {
         resultModal.style.display = "none";
         overlay.style.display = "none";
         gameBoard.restart();
+        AiController.resetAiBoard();
     });
 
     const _congratulateWinner = () => {
@@ -223,21 +224,16 @@ const gameProgression = (() => {
         resultModal.textContent = "The winner is " + `${_currentPlayer}` + "!";
     }
 
-    // need to check if the player is a bot here 
     let _currentPlayer = "player1";
     const changePlayerTurn = () => {
         if (_currentPlayer == "player1"){
             _currentPlayer = "player2";
             if (gameBoard.getPlayer("player2").getPlayerType() == true){
-            //if getPlayer2 . getPlayerType == false then redirect to AI and change turn back  
-            //call AI with current player as input
-
             setTimeout(AiController.checkDifficulty, 2500);
             }
         } else if (_currentPlayer == "player2"){
             _currentPlayer = "player1";
             if (gameBoard.getPlayer("player1").getPlayerType() == true){
-            //if getPlayer1 . getPlayerType == false then redirect to AI and change turn back
             setTimeout(AiController.checkDifficulty, 2500); 
             }
         }
@@ -256,32 +252,47 @@ const gameProgression = (() => {
 const AiController = (() => {
 
     const _openSquares = () => gameBoard.getGrid().filter((item) => item.innerHTML== '');
+    // const _openSquares = () => Ai_board.filter((item) => item != 'x' || item != 'o');
     const _randomIndex = () => Math.floor(Math.random()*_openSquares().length);
     const _randomNumber = () => Math.floor(Math.random()*100);
     
     const checkDifficulty = () => {
         const _randNum = _randomNumber();
         if (_randNum >= gameBoard.getPlayer(gameProgression.getCurrentPlayer()).getDifficulty()){
-            randomMove();
+            _randomMove();
         } else if (_randNum <= gameBoard.getPlayer(gameProgression.getCurrentPlayer()).getDifficulty()){
-            _bestMove();
+            //call AI 
         }
     };
 
-    const randomMove = () => {
-        const input = document.createElement("img");
+    const _randomMove = () => {
+        const _input = document.createElement("img");
+        let _sign;
+        const _randInd = _randomIndex();
         if(gameBoard.getPlayer(gameProgression.getCurrentPlayer()).getPlayerSign() == true){
-            input.src = "icons/close.svg";
+            _input.src = "icons/close.svg";
+            _sign = true;
         } else if (gameBoard.getPlayer(gameProgression.getCurrentPlayer()).getPlayerSign() == false){
-            input.src = "icons/circle-outline.svg";
+            _input.src = "icons/circle-outline.svg";
+            _sign = false;
         }
-        _openSquares()[_randomIndex()].appendChild(input);
+        _openSquares()[_randInd].appendChild(_input);
+        updateAiBoard(_randInd,_sign);
         gameProgression.checkWin();
     };
 
-    const _bestMove = () => {
-
+    let Ai_board = [0,1,2,3,4,5,6,7,8];
+    const updateAiBoard = (index,sign) => {
+        if (sign == true){
+            Ai_board[index] = 'x';
+        } else if (sign == false){
+            Ai_board[index] = 'o'
+        }
+        console.log(Ai_board);
+    };
+    const resetAiBoard = () => {
+        Ai_board =  [0,1,2,3,4,5,6,7,8];
     };
 
-    return {checkDifficulty}
+    return {checkDifficulty, updateAiBoard, resetAiBoard}
 })();
