@@ -160,7 +160,7 @@ const gameBoard = (() => {
     _grid.forEach((item) => item.addEventListener('click', applyInput));
     const getContent = (index) => _grid[index].innerHTML;
     const getGrid = () => _grid;
-    console.log(_grid);
+    // console.log(_grid);
 
     return {restart, getContent, applyInput, getGrid, updatePlayer, getPlayer}
 })();
@@ -251,9 +251,9 @@ const gameProgression = (() => {
 
 const AiController = (() => {
 
-    const _openSquares = () => gameBoard.getGrid().filter((item) => item.innerHTML== '');
-    // const _openSquares = () => Ai_board.filter((item) => item != 'x' || item != 'o');
-    const _randomIndex = () => Math.floor(Math.random()*_openSquares().length);
+    // const _openSquares = () => gameBoard.getGrid().filter((item) => item.innerHTML== '');
+    const _openSquares = () => Ai_board.filter((item) => (item != 'x' && item != 'o'));
+    const _randomIndex = () => Math.floor(Math.random()*(_openSquares().length-1));
     const _randomNumber = () => Math.floor(Math.random()*100);
     
     const checkDifficulty = () => {
@@ -266,9 +266,11 @@ const AiController = (() => {
     };
 
     const _randomMove = () => {
-        const _input = document.createElement("img");
+        let _openSqs = _openSquares();
+        let _randInd = _randomIndex();
         let _sign;
-        const _randInd = _randomIndex();
+        const _input = document.createElement("img");
+
         if(gameBoard.getPlayer(gameProgression.getCurrentPlayer()).getPlayerSign() == true){
             _input.src = "icons/close.svg";
             _sign = true;
@@ -276,8 +278,9 @@ const AiController = (() => {
             _input.src = "icons/circle-outline.svg";
             _sign = false;
         }
-        _openSquares()[_randInd].appendChild(_input);
-        updateAiBoard(_randInd,_sign);
+
+        gameBoard.getGrid()[_openSqs[_randInd]].appendChild(_input);
+        updateAiBoard(_openSqs[_randInd],_sign);
         gameProgression.checkWin();
     };
 
