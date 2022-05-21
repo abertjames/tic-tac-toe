@@ -47,6 +47,8 @@ const gameBoard = (() => {
     signOneSelector.addEventListener("change", (e) => {
         updatePlayer(player1, !player1.getPlayerSign(), player1.getPlayerType(), player1.getDifficulty());
         updatePlayer(player2, !player2.getPlayerSign(), player2.getPlayerType(), player2.getDifficulty());
+        AiController.updatePlayers();
+
         if (e.target.value == 'o'){
             signTwoSelector.value = 'x';
         } else if (e.target.value == 'x'){
@@ -58,6 +60,8 @@ const gameBoard = (() => {
     signTwoSelector.addEventListener("change", (e) => {
         updatePlayer(player2, !player2.getPlayerSign(), player2.getPlayerType(), player2.getDifficulty());
         updatePlayer(player1, !player1.getPlayerSign(), player1.getPlayerType(), player2.getDifficulty());
+        AiController.updatePlayers();
+
         if (e.target.value == 'x'){
             signOneSelector.value = 'o';
         } else if (e.target.value == 'o'){
@@ -228,11 +232,17 @@ const gameProgression = (() => {
     const changePlayerTurn = () => {
         if (_currentPlayer == "player1"){
             _currentPlayer = "player2";
+
+            AiController.changePlayers();
+
             if (gameBoard.getPlayer("player2").getPlayerType() == true){
             setTimeout(AiController.checkDifficulty, 2500);
             }
         } else if (_currentPlayer == "player2"){
             _currentPlayer = "player1";
+
+            AiController.changePlayers();
+
             if (gameBoard.getPlayer("player1").getPlayerType() == true){
             setTimeout(AiController.checkDifficulty, 2500); 
             }
@@ -251,9 +261,30 @@ const gameProgression = (() => {
 
 const AiController = (() => {
 
-    // const _openSquares = () => gameBoard.getGrid().filter((item) => item.innerHTML== '');
-    const _openSquares = () => Ai_board.filter((item) => (item != 'x' && item != 'o'));
-    const _randomIndex = () => Math.floor(Math.random()*(_openSquares().length-1));
+    let _player1 = 'x';
+    let _player2 = 'o';
+    const updatePlayers = () => {
+        let _temp = _player1;
+        _player1 = _player2;
+        _player2 = _temp;
+        _currentPlayer = _player1;
+        _nextPlayer = _player2;
+        console.log("player1 " + `${_player1}`);
+        console.log("player2 " + `${_player2}`);
+
+    };
+
+    let _currentPlayer = _player1;
+    let _nextPlayer = _player2;
+    const changePlayers = () => {
+        let _temp = _currentPlayer;
+        _currentPlayer = _nextPlayer;
+        _nextPlayer = _temp;
+        console.log("current player " + `${_currentPlayer}`);
+    };
+
+    const _openSquares = (board) => board.filter((item) => (item != 'x' && item != 'o'));
+    const _randomIndex = () => Math.floor(Math.random()*(_openSquares(Ai_board).length-1));
     const _randomNumber = () => Math.floor(Math.random()*100);
     
     const checkDifficulty = () => {
@@ -261,31 +292,32 @@ const AiController = (() => {
         if (_randNum >= gameBoard.getPlayer(gameProgression.getCurrentPlayer()).getDifficulty()){
             _randomMove();
         } else if (_randNum <= gameBoard.getPlayer(gameProgression.getCurrentPlayer()).getDifficulty()){
-            //call AI 
+            let _Ai_move = miniMax(Ai_board, _currentPlayer);
+            console.log(_Ai_move)
+            _applyMove(_Ai_move);
         }
     };
 
     const _randomMove = () => {
-        let _openSqs = _openSquares();
+        let _openSqs = _openSquares(Ai_board);
         let _randInd = _randomIndex();
         let _sign;
         const _input = document.createElement("img");
 
-        if(gameBoard.getPlayer(gameProgression.getCurrentPlayer()).getPlayerSign() == true){
+        if (gameBoard.getPlayer(gameProgression.getCurrentPlayer()).getPlayerSign() == true){
             _input.src = "icons/close.svg";
             _sign = true;
         } else if (gameBoard.getPlayer(gameProgression.getCurrentPlayer()).getPlayerSign() == false){
             _input.src = "icons/circle-outline.svg";
             _sign = false;
         }
-
         gameBoard.getGrid()[_openSqs[_randInd]].appendChild(_input);
         updateAiBoard(_openSqs[_randInd],_sign);
         gameProgression.checkWin();
     };
 
     let Ai_board = [0,1,2,3,4,5,6,7,8];
-    const updateAiBoard = (index,sign) => {
+    const updateAiBoard = (index, sign) => {
         if (sign == true){
             Ai_board[index] = 'x';
         } else if (sign == false){
@@ -293,9 +325,114 @@ const AiController = (() => {
         }
         console.log(Ai_board);
     };
+
     const resetAiBoard = () => {
         Ai_board =  [0,1,2,3,4,5,6,7,8];
     };
 
-    return {checkDifficulty, updateAiBoard, resetAiBoard}
+    const _applyMove = (Ai_move) => {
+        let _sign;
+        const _input = document.createElement("img");
+        if (_currentPlayer == 'x'){
+            _input.src = "icons/close.svg";
+            _sign = true;
+        } else if (_currentPlayer == 'o'){
+            _input.src = "icons/circle-outline.svg";
+            _sign = false;
+        }
+        gameBoard.getGrid()[Ai_move.index].appendChild(_input);
+        updateAiBoard(Ai_move.index, _sign);
+        console.log(Ai_board);
+        gameProgression.checkWin();
+    };
+
+    const _checkGameOver = (board, player) => {
+        if (
+            (board[0] == player && board[1] == player && board[2] == player) ||
+            (board[3] == player && board[4] == player && board[5] == player) ||
+            (board[6] == player && board[7] == player && board[8] == player) ||
+            (board[0] == player && board[3] == player && board[6] == player) ||
+            (board[1] == player && board[4] == player && board[7] == player) ||
+            (board[2] == player && board[5] == player && board[8] == player) ||
+            (board[0] == player && board[4] == player && board[8] == player) ||
+            (board[2] == player && board[4] == player && board[6] == player)
+            ) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    const _findBestMove = (moves,player) => {
+        let bestMove;
+        if (player === _currentPlayer){
+          let bestScore = -10000;
+          for (let i = 0; i < moves.length; i++){
+            if (moves[i].score > bestScore){
+                bestScore = moves[i].score;
+                bestMove = i;
+            }
+          }
+        } else {
+      
+        let bestScore = 10000;
+          for (let i = 0; i < moves.length; i++){
+            if (moves[i].score < bestScore){
+                bestScore = moves[i].score;
+                bestMove = i;
+            }
+          }
+        }
+        // console.log(moves[bestMove]);
+        return moves[bestMove]
+    }
+
+    const miniMax = (newBoard, player) => {
+        // console.log(newBoard);
+        let _openSqs = _openSquares(newBoard);
+
+        // this might cause problems for bot v bot scenarios 
+        //might want to set it up as current player vs next player 
+
+        //have check for which player has been passed into minimax and depending on which one enter a different 
+        //set of if statements . or internally define which player is the current player and which isnt (with recursion 
+        //this could be iffy tho). first in the check below goes to the player passed into the function 
+        //and the other goes to the next player 
+        if (_checkGameOver(newBoard, _player1)){
+            if (_player1 == _currentPlayer){
+                return {score: 10}
+            } else {
+                return {score: -10}
+            }
+
+        } else if (_checkGameOver(newBoard, _player2)){
+            if (_player2 == _currentPlayer){
+                return {score: 10}
+            } else {
+                return {score: -10}
+            }
+
+        } else if (_openSqs.length == 0){
+            return {score: 0}
+        }
+
+        let moves = [];
+        for (let i = 0; i < _openSqs.length; i++){
+            let move = {};
+            move.index = newBoard[_openSqs[i]];
+            newBoard[_openSqs[i]] = player;
+            if (player == _player1){
+                let result = miniMax(newBoard, _player2);
+                move.score = result.score;
+            } else {
+                let result = miniMax(newBoard, _player1);
+                move.score = result.score;
+            }
+            newBoard[_openSqs[i]] = move.index;
+            moves.push(move);
+        }
+        return _findBestMove(moves,player)
+    };
+
+    return {checkDifficulty, updateAiBoard, resetAiBoard, updatePlayers, changePlayers}
 })();
