@@ -271,7 +271,6 @@ const AiController = (() => {
         _nextPlayer = _player2;
         console.log("player1 " + `${_player1}`);
         console.log("player2 " + `${_player2}`);
-
     };
 
     let _currentPlayer = _player1;
@@ -293,7 +292,7 @@ const AiController = (() => {
             _randomMove();
         } else if (_randNum <= gameBoard.getPlayer(gameProgression.getCurrentPlayer()).getDifficulty()){
             let _Ai_move = miniMax(Ai_board, _currentPlayer);
-            console.log(_Ai_move)
+            // console.log(_Ai_move)
             _applyMove(_Ai_move);
         }
     };
@@ -328,6 +327,8 @@ const AiController = (() => {
 
     const resetAiBoard = () => {
         Ai_board =  [0,1,2,3,4,5,6,7,8];
+        _currentPlayer = _player1;
+        _nextPlayer = _player2;
     };
 
     const _applyMove = (Ai_move) => {
@@ -342,7 +343,7 @@ const AiController = (() => {
         }
         gameBoard.getGrid()[Ai_move.index].appendChild(_input);
         updateAiBoard(Ai_move.index, _sign);
-        console.log(Ai_board);
+        // console.log(Ai_board);
         gameProgression.checkWin();
     };
 
@@ -366,7 +367,7 @@ const AiController = (() => {
     const _findBestMove = (moves,player) => {
         let bestMove;
         if (player === _currentPlayer){
-          let bestScore = -10000;
+          let bestScore = -Infinity;
           for (let i = 0; i < moves.length; i++){
             if (moves[i].score > bestScore){
                 bestScore = moves[i].score;
@@ -375,7 +376,7 @@ const AiController = (() => {
           }
         } else {
       
-        let bestScore = 10000;
+        let bestScore = Infinity;
           for (let i = 0; i < moves.length; i++){
             if (moves[i].score < bestScore){
                 bestScore = moves[i].score;
@@ -388,16 +389,7 @@ const AiController = (() => {
     }
 
     const miniMax = (newBoard, player) => {
-        // console.log(newBoard);
         let _openSqs = _openSquares(newBoard);
-
-        // this might cause problems for bot v bot scenarios 
-        //might want to set it up as current player vs next player 
-
-        //have check for which player has been passed into minimax and depending on which one enter a different 
-        //set of if statements . or internally define which player is the current player and which isnt (with recursion 
-        //this could be iffy tho). first in the check below goes to the player passed into the function 
-        //and the other goes to the next player 
         if (_checkGameOver(newBoard, _player1)){
             if (_player1 == _currentPlayer){
                 return {score: 10}
